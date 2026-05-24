@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HDXCloud — Premium Minecraft & VPS Hosting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #020408;
+  --bg-dark: #040c14;
+  --bg-card: rgba(6,18,32,0.85);
+  --neon-blue: #00d4ff;
+  --neon-cyan: #00ffea;
+  --neon-mid: #0099cc;
+  --accent: #0066ff;
+  --accent2: #00aaff;
+  --glow-blue: 0 0 20px rgba(0,212,255,0.6), 0 0 60px rgba(0,212,255,0.2);
+  --glow-cyan: 0 0 20px rgba(0,255,234,0.6), 0 0 60px rgba(0,255,234,0.2);
+  --glow-soft: 0 0 40px rgba(0,150,255,0.15);
+  --border-glow: 1px solid rgba(0,212,255,0.25);
+  --font-head: 'Orbitron', sans-serif;
+  --font-body: 'Exo 2', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
+  --glass: rgba(0,180,255,0.04);
+  --glass-border: rgba(0,212,255,0.15);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;overflow-x:hidden;}
+body{
+  background:var(--bg-deep);
+  color:#c8e8ff;
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.6;
+  overflow-x:hidden;
+  cursor:none;
+}
+/* CUSTOM CURSOR */
+#cursor{position:fixed;width:12px;height:12px;background:var(--neon-blue);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform 0.1s,width 0.2s,height 0.2s;box-shadow:var(--glow-blue);mix-blend-mode:screen;}
+#cursor-ring{position:fixed;width:36px;height:36px;border:1.5px solid rgba(0,212,255,0.5);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:transform 0.18s ease,width 0.2s,height 0.2s;mix-blend-mode:screen;}
+body:hover #cursor{display:block;}
+
+/* LOADING SCREEN */
+#loader{
+  position:fixed;inset:0;background:var(--bg-deep);z-index:99990;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity 0.8s ease, visibility 0.8s;
+}
+#loader.hidden{opacity:0;visibility:hidden;}
+.loader-logo{
+  font-family:var(--font-head);font-size:3rem;font-weight:900;
+  background:linear-gradient(135deg,var(--neon-blue),var(--neon-cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:logoPulse 1.5s ease-in-out infinite alternate;
+  letter-spacing:4px;margin-bottom:10px;
+}
+.loader-sub{font-family:var(--font-mono);font-size:0.75rem;color:var(--neon-mid);letter-spacing:3px;margin-bottom:40px;opacity:0.7;}
+.loader-bar-wrap{width:320px;height:3px;background:rgba(0,212,255,0.1);border-radius:10px;overflow:hidden;position:relative;}
+.loader-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--neon-blue),var(--neon-cyan));border-radius:10px;animation:loaderFill 2.2s ease forwards;box-shadow:var(--glow-blue);}
+.loader-pct{font-family:var(--font-mono);font-size:0.7rem;color:var(--neon-blue);margin-top:14px;letter-spacing:2px;}
+.loader-particles{position:absolute;inset:0;overflow:hidden;}
+.lp{position:absolute;width:2px;height:2px;background:var(--neon-blue);border-radius:50%;animation:lpFloat 3s ease-in-out infinite;opacity:0;}
+@keyframes logoPulse{0%{filter:drop-shadow(0 0 10px rgba(0,212,255,0.8));}100%{filter:drop-shadow(0 0 30px rgba(0,255,234,1));}}
+@keyframes loaderFill{0%{width:0;}40%{width:55%;}70%{width:80%;}100%{width:100%;}}
+@keyframes lpFloat{0%{opacity:0;transform:translateY(0);}50%{opacity:1;}100%{opacity:0;transform:translateY(-80px);}}
+
+/* PARTICLES BG */
+#particles-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.pt{position:absolute;width:1.5px;height:1.5px;background:var(--neon-blue);border-radius:50%;opacity:0;animation:ptDrift linear infinite;}
+@keyframes ptDrift{0%{opacity:0;transform:translateY(100vh) translateX(0);}10%{opacity:0.6;}90%{opacity:0.2;}100%{opacity:0;transform:translateY(-10vh) translateX(40px);}}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  padding:0 2rem;height:72px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(2,4,8,0.7);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(0,212,255,0.08);
+  transition:background 0.3s;
+}
+nav.scrolled{background:rgba(2,4,8,0.95);}
+.nav-brand{display:flex;align-items:center;gap:12px;}
+.nav-logo-glow{
+  width:38px;height:38px;
+  background:linear-gradient(135deg,var(--accent),var(--neon-blue));
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-head);font-weight:900;font-size:1rem;color:#000;
+  box-shadow:0 0 20px rgba(0,150,255,0.5);
+  position:relative;overflow:hidden;
+}
+.nav-logo-glow::after{content:'';position:absolute;inset:-50%;background:linear-gradient(45deg,transparent,rgba(255,255,255,0.3),transparent);animation:shimmer 2.5s infinite;}
+.nav-brand-name{font-family:var(--font-head);font-size:1.1rem;font-weight:700;color:#fff;letter-spacing:2px;}
+.nav-brand-name span{color:var(--neon-blue);}
+.nav-links{display:flex;align-items:center;gap:2rem;}
+.nav-links a{font-family:var(--font-body);font-size:0.85rem;font-weight:500;color:rgba(200,232,255,0.7);text-decoration:none;letter-spacing:1px;transition:color 0.2s;position:relative;}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--neon-blue);transition:width 0.3s;}
+.nav-links a:hover{color:var(--neon-blue);}
+.nav-links a:hover::after{width:100%;}
+.nav-cta{
+  padding:8px 22px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),var(--neon-blue));
+  color:#000;font-weight:700;font-size:0.8rem;font-family:var(--font-head);
+  letter-spacing:1px;text-decoration:none;
+  box-shadow:0 0 20px rgba(0,150,255,0.4);
+  transition:box-shadow 0.3s,transform 0.2s;
+}
+.nav-cta:hover{box-shadow:0 0 40px rgba(0,212,255,0.8);transform:translateY(-1px);color:#000!important;}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
+.nav-hamburger span{display:block;width:24px;height:2px;background:var(--neon-blue);border-radius:2px;transition:0.3s;}
+
+/* HERO */
+#hero{
+  min-height:100vh;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:flex-start;
+  padding:120px 6vw 60px;
+}
+#hero-canvas{position:absolute;inset:0;z-index:1;}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(2,4,8,0.92) 0%,rgba(2,4,8,0.7) 50%,rgba(2,4,8,0.4) 100%);z-index:2;}
+.hero-content{position:relative;z-index:3;max-width:680px;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px;border-radius:20px;
+  border:1px solid rgba(0,212,255,0.3);
+  background:rgba(0,212,255,0.05);
+  font-family:var(--font-mono);font-size:0.7rem;color:var(--neon-blue);
+  letter-spacing:2px;margin-bottom:24px;
+  animation:fadeSlideUp 0.8s ease both;
+}
+.badge-dot{width:6px;height:6px;background:var(--neon-cyan);border-radius:50%;animation:pulse 1.5s infinite;}
+.hero-h1{
+  font-family:var(--font-head);font-size:clamp(2.2rem,5vw,4.2rem);font-weight:900;
+  line-height:1.1;letter-spacing:2px;margin-bottom:24px;
+  animation:fadeSlideUp 0.9s 0.15s ease both;
+}
+.hero-h1 span{
+  background:linear-gradient(135deg,var(--neon-blue),var(--neon-cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 15px rgba(0,212,255,0.5));
+}
+.hero-sub{
+  font-size:1.05rem;color:rgba(200,232,255,0.75);line-height:1.7;
+  margin-bottom:40px;max-width:520px;
+  animation:fadeSlideUp 1s 0.3s ease both;
+}
+.hero-btns{display:flex;flex-wrap:wrap;gap:14px;animation:fadeSlideUp 1.1s 0.45s ease both;}
+.btn-primary{
+  padding:14px 32px;border-radius:10px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),var(--neon-blue));
+  color:#000;font-family:var(--font-head);font-weight:700;font-size:0.85rem;
+  letter-spacing:1.5px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+  box-shadow:0 0 30px rgba(0,150,255,0.5),0 4px 20px rgba(0,0,0,0.5);
+  transition:all 0.3s;position:relative;overflow:hidden;
+}
+.btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--neon-blue),var(--neon-cyan));opacity:0;transition:opacity 0.3s;}
+.btn-primary:hover::before{opacity:1;}
+.btn-primary:hover{box-shadow:0 0 50px rgba(0,212,255,0.8),0 4px 30px rgba(0,0,0,0.5);transform:translateY(-2px);}
+.btn-primary span{position:relative;z-index:1;}
+.btn-secondary{
+  padding:14px 32px;border-radius:10px;cursor:pointer;
+  background:rgba(0,212,255,0.05);
+  border:1px solid rgba(0,212,255,0.4);
+  color:var(--neon-blue);font-family:var(--font-head);font-weight:600;font-size:0.85rem;
+  letter-spacing:1.5px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+  transition:all 0.3s;backdrop-filter:blur(10px);
+}
+.btn-secondary:hover{background:rgba(0,212,255,0.12);border-color:var(--neon-blue);box-shadow:var(--glow-blue);transform:translateY(-2px);}
+.btn-discord{
+  padding:14px 32px;border-radius:10px;cursor:pointer;
+  background:rgba(88,101,242,0.15);
+  border:1px solid rgba(88,101,242,0.4);
+  color:#8b9ff4;font-family:var(--font-head);font-weight:600;font-size:0.85rem;
+  letter-spacing:1.5px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+  transition:all 0.3s;
+}
+.btn-discord:hover{background:rgba(88,101,242,0.25);border-color:#7289da;box-shadow:0 0 30px rgba(88,101,242,0.4);transform:translateY(-2px);}
+.hero-stats{
+  display:flex;gap:2rem;margin-top:50px;flex-wrap:wrap;
+  animation:fadeSlideUp 1.2s 0.6s ease both;
+}
+.hstat{display:flex;flex-direction:column;}
+.hstat-num{font-family:var(--font-head);font-size:1.6rem;font-weight:900;color:#fff;}
+.hstat-num span{color:var(--neon-blue);}
+.hstat-lbl{font-size:0.72rem;color:rgba(200,232,255,0.5);letter-spacing:1px;}
+
+/* SECTIONS COMMON */
+section{position:relative;z-index:10;}
+.section-pad{padding:100px 6vw;}
+.section-head{text-align:center;margin-bottom:60px;}
+.section-head .tag{
+  display:inline-block;padding:4px 16px;border-radius:20px;
+  border:1px solid rgba(0,212,255,0.3);background:rgba(0,212,255,0.05);
+  font-family:var(--font-mono);font-size:0.7rem;color:var(--neon-blue);
+  letter-spacing:2px;margin-bottom:16px;
+}
+.section-head h2{
+  font-family:var(--font-head);font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:800;
+  color:#fff;letter-spacing:2px;margin-bottom:16px;line-height:1.2;
+}
+.section-head h2 span{
+  background:linear-gradient(135deg,var(--neon-blue),var(--neon-cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.section-head p{font-size:1rem;color:rgba(200,232,255,0.6);max-width:580px;margin:0 auto;line-height:1.7;}
+.glass-card{
+  background:var(--glass);
+  border:var(--border-glow);
+  border-radius:16px;
+  backdrop-filter:blur(16px);
+  transition:all 0.35s ease;
+  position:relative;overflow:hidden;
+}
+.glass-card::before{
+  content:'';position:absolute;inset:0;
+  border-radius:inherit;
+  background:linear-gradient(135deg,rgba(0,212,255,0.04),transparent,rgba(0,212,255,0.02));
+  opacity:0;transition:opacity 0.3s;
+}
+.glass-card:hover::before{opacity:1;}
+.glass-card:hover{
+  border-color:rgba(0,212,255,0.4);
+  box-shadow:0 0 40px rgba(0,150,255,0.15),0 20px 60px rgba(0,0,0,0.4);
+  transform:translateY(-4px);
+}
+
+/* FLASH SALE */
+#flash-sale{
+  padding:0 6vw;margin:0 0 20px;
+}
+.sale-banner{
+  background:linear-gradient(135deg,rgba(0,102,255,0.12),rgba(0,212,255,0.08),rgba(0,102,255,0.12));
+  border:1px solid rgba(0,212,255,0.3);
+  border-radius:16px;padding:28px 40px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;
+  position:relative;overflow:hidden;
+  animation:borderGlow 3s ease infinite alternate;
+}
+.sale-banner::before{
+  content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent);
+  animation:saleSweep 4s ease infinite;
+}
+@keyframes saleSweep{0%{left:-100%;}100%{left:200%;}}
+@keyframes borderGlow{0%{box-shadow:0 0 20px rgba(0,150,255,0.2);}100%{box-shadow:0 0 50px rgba(0,212,255,0.4);}}
+.sale-left{display:flex;align-items:center;gap:16px;}
+.sale-fire{font-size:2rem;animation:fireShake 0.5s ease infinite alternate;}
+@keyframes fireShake{0%{transform:rotate(-5deg);}100%{transform:rotate(5deg);}}
+.sale-text h3{font-family:var(--font-head);font-size:1rem;color:#fff;letter-spacing:1px;margin-bottom:4px;}
+.sale-text p{font-size:0.85rem;color:var(--neon-blue);font-weight:600;}
+.countdown{display:flex;gap:12px;}
+.cd-item{display:flex;flex-direction:column;align-items:center;}
+.cd-num{
+  font-family:var(--font-head);font-size:1.4rem;font-weight:900;color:#fff;
+  background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);
+  padding:8px 14px;border-radius:8px;min-width:52px;text-align:center;
+  box-shadow:0 0 15px rgba(0,150,255,0.2);
+}
+.cd-lbl{font-size:0.6rem;color:rgba(200,232,255,0.4);letter-spacing:1px;margin-top:4px;}
+
+/* STATUS SECTION */
+#status{background:linear-gradient(180deg,transparent,rgba(0,10,25,0.5),transparent);}
+.status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;}
+.status-card{
+  padding:24px;border-radius:14px;
+  background:var(--glass);border:var(--border-glow);
+  backdrop-filter:blur(16px);
+}
+.status-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.status-label{font-family:var(--font-mono);font-size:0.7rem;color:rgba(200,232,255,0.5);letter-spacing:2px;}
+.status-dot{width:10px;height:10px;border-radius:50%;background:#00ff88;box-shadow:0 0 10px #00ff88,0 0 20px rgba(0,255,136,0.4);animation:statusPulse 2s ease infinite;}
+.status-dot.yellow{background:#ffcc00;box-shadow:0 0 10px #ffcc00;}
+@keyframes statusPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.6;transform:scale(0.85);}}
+.status-value{font-family:var(--font-head);font-size:1.4rem;font-weight:700;color:#fff;}
+.status-value span{color:var(--neon-cyan);font-size:0.85rem;margin-left:6px;}
+.status-desc{font-size:0.75rem;color:rgba(200,232,255,0.4);margin-top:4px;}
+
+/* PRICING */
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:24px;}
+.plan-card{
+  border-radius:20px;padding:32px 26px;
+  background:var(--bg-card);
+  border:1px solid var(--glass-border);
+  backdrop-filter:blur(20px);
+  position:relative;overflow:hidden;
+  transition:all 0.4s cubic-bezier(.25,.8,.25,1);
+  display:flex;flex-direction:column;
+}
+.plan-card::after{
+  content:'';position:absolute;inset:0;
+  border-radius:inherit;
+  background:radial-gradient(ellipse at top,rgba(0,212,255,0.06),transparent 70%);
+  opacity:0;transition:opacity 0.4s;
+}
+.plan-card:hover::after{opacity:1;}
+.plan-card:hover{
+  border-color:rgba(0,212,255,0.5);
+  box-shadow:0 0 60px rgba(0,150,255,0.2),0 30px 80px rgba(0,0,0,0.5);
+  transform:translateY(-8px) scale(1.01);
+}
+.plan-card.popular{
+  border-color:rgba(0,212,255,0.5);
+  background:linear-gradient(145deg,rgba(0,102,255,0.08),rgba(0,18,36,0.9));
+  box-shadow:0 0 40px rgba(0,150,255,0.15);
+}
+.popular-badge{
+  position:absolute;top:16px;right:16px;
+  padding:4px 12px;border-radius:20px;
+  background:linear-gradient(135deg,var(--accent),var(--neon-blue));
+  color:#000;font-family:var(--font-head);font-size:0.6rem;font-weight:700;letter-spacing:1px;
+  box-shadow:0 0 15px rgba(0,150,255,0.4);
+}
+.plan-tier{font-family:var(--font-mono);font-size:0.65rem;color:var(--neon-mid);letter-spacing:3px;margin-bottom:8px;}
+.plan-name{font-family:var(--font-head);font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:20px;letter-spacing:1px;}
+.plan-price{margin-bottom:24px;}
+.plan-price .amt{font-family:var(--font-head);font-size:2.2rem;font-weight:900;color:#fff;}
+.plan-price .amt span{font-size:1rem;color:var(--neon-blue);}
+.plan-price .period{font-size:0.8rem;color:rgba(200,232,255,0.4);margin-left:4px;}
+.plan-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,0.2),transparent);margin:20px 0;}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:10px;flex:1;}
+.plan-features li{display:flex;align-items:center;gap:10px;font-size:0.82rem;color:rgba(200,232,255,0.75);}
+.plan-features li::before{content:'▹';color:var(--neon-blue);font-size:0.9rem;flex-shrink:0;}
+.plan-btn{
+  margin-top:28px;width:100%;padding:13px;border-radius:10px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),var(--neon-blue));
+  color:#000;font-family:var(--font-head);font-weight:700;font-size:0.8rem;letter-spacing:1.5px;
+  box-shadow:0 0 20px rgba(0,150,255,0.3);
+  transition:all 0.3s;text-decoration:none;display:block;text-align:center;
+}
+.plan-card.popular .plan-btn{background:linear-gradient(135deg,var(--neon-blue),var(--neon-cyan));}
+.plan-btn:hover{box-shadow:0 0 40px rgba(0,212,255,0.6);transform:scale(1.02);}
+
+/* FEATURES GRID */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;}
+.feat-card{
+  padding:28px;border-radius:16px;
+  background:var(--glass);border:var(--border-glow);
+  backdrop-filter:blur(16px);
+  transition:all 0.35s ease;
+}
+.feat-card:hover{
+  border-color:rgba(0,212,255,0.4);
+  box-shadow:0 0 40px rgba(0,150,255,0.12),0 20px 50px rgba(0,0,0,0.3);
+  transform:translateY(-6px);
+}
+.feat-icon{
+  width:52px;height:52px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(0,102,255,0.2),rgba(0,212,255,0.1));
+  border:1px solid rgba(0,212,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;margin-bottom:18px;
+  box-shadow:0 0 20px rgba(0,150,255,0.1);
+}
+.feat-card h3{font-family:var(--font-head);font-size:0.9rem;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:0.5px;}
+.feat-card p{font-size:0.8rem;color:rgba(200,232,255,0.55);line-height:1.6;}
+
+/* DATACENTER MAP */
+#datacenter{background:rgba(0,5,15,0.5);}
+#dc-map-canvas{width:100%;height:420px;position:relative;}
+.dc-locations{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:40px;}
+.dc-loc{
+  padding:20px;border-radius:12px;
+  background:var(--glass);border:var(--border-glow);
+  display:flex;align-items:flex-start;gap:14px;
+}
+.dc-loc-dot{
+  width:12px;height:12px;border-radius:50%;background:#00ff88;
+  box-shadow:0 0 10px #00ff88,0 0 20px rgba(0,255,136,0.3);
+  margin-top:4px;flex-shrink:0;animation:statusPulse 2s ease infinite;
+}
+.dc-loc-name{font-family:var(--font-head);font-size:0.8rem;font-weight:700;color:#fff;letter-spacing:0.5px;margin-bottom:6px;}
+.dc-loc-stats{display:flex;flex-direction:column;gap:3px;}
+.dc-loc-stat{font-size:0.7rem;color:rgba(200,232,255,0.5);}
+.dc-loc-stat span{color:var(--neon-cyan);}
+
+/* MINECRAFT VERSIONS */
+.mc-versions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:30px 0;}
+.mc-badge{
+  padding:6px 16px;border-radius:8px;
+  background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);
+  font-family:var(--font-mono);font-size:0.72rem;color:var(--neon-blue);
+  letter-spacing:1px;transition:all 0.2s;
+}
+.mc-badge:hover{background:rgba(0,212,255,0.12);border-color:var(--neon-blue);box-shadow:0 0 15px rgba(0,212,255,0.2);}
+.mc-types{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-top:24px;}
+.mc-type{
+  padding:20px;border-radius:12px;text-align:center;
+  background:var(--glass);border:var(--border-glow);
+  transition:all 0.3s;
+}
+.mc-type:hover{border-color:rgba(0,212,255,0.4);transform:translateY(-4px);box-shadow:0 0 30px rgba(0,150,255,0.1);}
+.mc-type-icon{font-size:1.6rem;margin-bottom:10px;}
+.mc-type-name{font-family:var(--font-head);font-size:0.8rem;font-weight:700;color:#fff;letter-spacing:0.5px;}
+
+/* PAYMENT */
+.payment-grid{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;}
+.pay-card{
+  padding:16px 24px;border-radius:12px;
+  background:var(--glass);border:var(--border-glow);
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--font-body);font-size:0.85rem;color:rgba(200,232,255,0.8);
+  transition:all 0.3s;cursor:default;
+}
+.pay-card:hover{border-color:rgba(0,212,255,0.4);box-shadow:0 0 25px rgba(0,150,255,0.15);transform:translateY(-3px);}
+.pay-icon{font-size:1.4rem;}
+
+/* COUNTERS */
+.counters-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:24px;}
+.counter-card{
+  padding:36px 24px;border-radius:16px;text-align:center;
+  background:var(--glass);border:var(--border-glow);
+  backdrop-filter:blur(16px);
+  transition:all 0.35s;
+}
+.counter-card:hover{border-color:rgba(0,212,255,0.4);box-shadow:0 0 40px rgba(0,150,255,0.15);}
+.counter-num{font-family:var(--font-head);font-size:2.8rem;font-weight:900;color:#fff;line-height:1;}
+.counter-num span{color:var(--neon-blue);}
+.counter-lbl{font-size:0.75rem;color:rgba(200,232,255,0.5);letter-spacing:2px;margin-top:10px;font-family:var(--font-mono);}
+
+/* REVIEWS */
+.reviews-track{overflow:hidden;position:relative;}
+.reviews-track::before,.reviews-track::after{
+  content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none;
+}
+.reviews-track::before{left:0;background:linear-gradient(90deg,var(--bg-deep),transparent);}
+.reviews-track::after{right:0;background:linear-gradient(-90deg,var(--bg-deep),transparent);}
+.reviews-inner{display:flex;gap:20px;animation:reviewsScroll 30s linear infinite;width:max-content;}
+.reviews-inner:hover{animation-play-state:paused;}
+.review-card{
+  width:300px;flex-shrink:0;padding:24px;border-radius:16px;
+  background:var(--glass);border:var(--border-glow);
+  backdrop-filter:blur(16px);
+}
+.review-stars{color:#ffd700;font-size:0.9rem;margin-bottom:12px;letter-spacing:2px;text-shadow:0 0 10px rgba(255,215,0,0.5);}
+.review-text{font-size:0.82rem;color:rgba(200,232,255,0.7);line-height:1.6;margin-bottom:16px;}
+.review-author{display:flex;align-items:center;gap:10px;}
+.review-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--neon-blue));display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:0.8rem;font-weight:700;color:#000;}
+.review-name{font-family:var(--font-head);font-size:0.78rem;font-weight:700;color:#fff;letter-spacing:0.5px;}
+.review-role{font-size:0.68rem;color:rgba(200,232,255,0.4);}
+@keyframes reviewsScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}};
+
+/* PANEL SHOWCASE */
+.panel-showcase{
+  border-radius:20px;padding:32px;
+  background:rgba(4,12,24,0.9);
+  border:1px solid rgba(0,212,255,0.2);
+  box-shadow:0 0 60px rgba(0,100,200,0.1);
+}
+.panel-topbar{
+  display:flex;align-items:center;gap:8px;margin-bottom:24px;padding-bottom:16px;
+  border-bottom:1px solid rgba(0,212,255,0.1);
+}
+.panel-dot{width:10px;height:10px;border-radius:50%;}
+.panel-dot.red{background:#ff5f57;}
+.panel-dot.yellow{background:#febc2e;}
+.panel-dot.green{background:#28c840;}
+.panel-title{font-family:var(--font-mono);font-size:0.72rem;color:rgba(200,232,255,0.3);margin-left:12px;letter-spacing:1px;}
+.panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.panel-widget{
+  background:rgba(0,150,255,0.04);border:1px solid rgba(0,212,255,0.1);
+  border-radius:12px;padding:18px;
+}
+.panel-widget-head{
+  font-family:var(--font-mono);font-size:0.65rem;color:rgba(200,232,255,0.4);
+  letter-spacing:2px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;
+}
+.panel-online{color:#00ff88;font-size:0.65rem;}
+.panel-console{
+  background:#000;border-radius:8px;padding:14px;
+  font-family:var(--font-mono);font-size:0.7rem;line-height:1.8;
+  max-height:120px;overflow:hidden;
+}
+.console-line{color:rgba(200,232,255,0.7);}
+.console-line.green{color:#00ff88;}
+.console-line.cyan{color:var(--neon-cyan);}
+.console-line.yellow{color:#ffcc00;}
+.graph-bar{
+  display:flex;align-items:flex-end;gap:4px;height:60px;
+}
+.gb{
+  flex:1;border-radius:3px 3px 0 0;
+  background:linear-gradient(180deg,var(--neon-blue),var(--accent));
+  box-shadow:0 0 8px rgba(0,150,255,0.3);
+  animation:barGrow 1s ease both;
+}
+@keyframes barGrow{from{height:0;}to{height:var(--h);}}
+.panel-stat{font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:#fff;}
+.panel-stat span{color:var(--neon-blue);font-size:0.8rem;}
+.panel-controls{display:flex;gap:8px;margin-top:12px;}
+.pctrl{
+  flex:1;padding:7px;border-radius:7px;border:none;cursor:pointer;
+  font-family:var(--font-mono);font-size:0.68rem;letter-spacing:1px;
+  transition:all 0.2s;
+}
+.pctrl.start{background:rgba(0,255,136,0.1);color:#00ff88;border:1px solid rgba(0,255,136,0.2);}
+.pctrl.stop{background:rgba(255,80,80,0.1);color:#ff5050;border:1px solid rgba(255,80,80,0.2);}
+.pctrl.restart{background:rgba(255,200,0,0.1);color:#ffc800;border:1px solid rgba(255,200,0,0.2);}
+.pctrl:hover{transform:scale(1.05);}
+
+/* INFRASTRUCTURE */
+.infra-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;}
+.infra-card{
+  padding:26px;border-radius:14px;
+  background:var(--glass);border:var(--border-glow);
+  text-align:center;transition:all 0.3s;
+}
+.infra-card:hover{border-color:rgba(0,212,255,0.4);box-shadow:0 0 40px rgba(0,150,255,0.12);transform:translateY(-5px);}
+.infra-icon{font-size:2rem;margin-bottom:12px;filter:drop-shadow(0 0 8px rgba(0,212,255,0.5));}
+.infra-card h3{font-family:var(--font-head);font-size:0.85rem;font-weight:700;color:#fff;margin-bottom:6px;letter-spacing:0.5px;}
+.infra-card p{font-size:0.75rem;color:rgba(200,232,255,0.5);}
+
+/* DISCORD */
+.discord-card{
+  background:linear-gradient(135deg,rgba(88,101,242,0.1),rgba(71,82,196,0.05));
+  border:1px solid rgba(88,101,242,0.3);
+  border-radius:24px;padding:60px 40px;text-align:center;
+  box-shadow:0 0 60px rgba(88,101,242,0.08);
+  transition:all 0.3s;
+}
+.discord-card:hover{border-color:rgba(88,101,242,0.5);box-shadow:0 0 80px rgba(88,101,242,0.15);}
+.discord-logo{font-size:3.5rem;margin-bottom:20px;filter:drop-shadow(0 0 15px rgba(88,101,242,0.6));}
+.discord-card h2{font-family:var(--font-head);font-size:1.8rem;font-weight:800;color:#fff;margin-bottom:12px;}
+.discord-card p{font-size:0.9rem;color:rgba(200,232,255,0.6);max-width:460px;margin:0 auto 32px;}
+.discord-stats{display:flex;justify-content:center;gap:40px;margin:28px 0;flex-wrap:wrap;}
+.dstat{display:flex;flex-direction:column;align-items:center;}
+.dstat-num{font-family:var(--font-head);font-size:1.6rem;font-weight:900;color:#fff;}
+.dstat-lbl{font-size:0.72rem;color:rgba(200,232,255,0.4);letter-spacing:1px;}
+.btn-discord-big{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:16px 40px;border-radius:12px;
+  background:linear-gradient(135deg,#5865f2,#7289da);
+  color:#fff;font-family:var(--font-head);font-weight:700;font-size:0.9rem;
+  letter-spacing:1.5px;text-decoration:none;
+  box-shadow:0 0 30px rgba(88,101,242,0.4);
+  transition:all 0.3s;
+}
+.btn-discord-big:hover{box-shadow:0 0 50px rgba(88,101,242,0.7);transform:translateY(-3px);}
+
+/* AI SUPPORT */
+.support-card{
+  display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;
+  padding:50px;border-radius:24px;
+  background:linear-gradient(135deg,rgba(0,80,160,0.08),rgba(0,30,60,0.6));
+  border:1px solid rgba(0,212,255,0.15);
+  box-shadow:0 0 60px rgba(0,100,200,0.06);
+}
+.support-chat{
+  background:rgba(0,0,0,0.4);border-radius:16px;padding:20px;
+  border:1px solid rgba(0,212,255,0.1);
+}
+.chat-msg{display:flex;gap:10px;margin-bottom:16px;align-items:flex-start;}
+.chat-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;}
+.chat-avatar.bot{background:linear-gradient(135deg,var(--accent),var(--neon-blue));color:#000;}
+.chat-avatar.user{background:rgba(200,232,255,0.1);color:rgba(200,232,255,0.7);}
+.chat-bubble{background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.1);border-radius:10px 10px 10px 0;padding:10px 14px;font-size:0.78rem;color:rgba(200,232,255,0.8);line-height:1.5;}
+.chat-bubble.user-bubble{background:rgba(255,255,255,0.05);border-radius:10px 10px 0 10px;}
+.chat-input{display:flex;gap:8px;margin-top:12px;}
+.chat-input input{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:10px 14px;font-size:0.78rem;color:rgba(200,232,255,0.8);outline:none;font-family:var(--font-body);}
+.chat-send{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--neon-blue));color:#000;font-size:0.75rem;font-weight:700;}
+
+/* PARTNERS */
+.partners-row{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;}
+.partner-card{
+  padding:16px 28px;border-radius:12px;
+  background:var(--glass);border:var(--border-glow);
+  font-family:var(--font-head);font-size:0.75rem;font-weight:700;
+  color:rgba(200,232,255,0.5);letter-spacing:1.5px;
+  transition:all 0.3s;cursor:default;
+}
+.partner-card:hover{color:var(--neon-blue);border-color:rgba(0,212,255,0.4);box-shadow:0 0 20px rgba(0,150,255,0.1);}
+
+/* FAQ */
+.faq-list{max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:12px;}
+.faq-item{
+  border-radius:12px;overflow:hidden;
+  background:var(--glass);border:var(--border-glow);
+}
+.faq-q{
+  padding:20px 24px;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--font-body);font-size:0.9rem;font-weight:600;color:#fff;
+  transition:color 0.2s;
+}
+.faq-q:hover{color:var(--neon-blue);}
+.faq-q span{color:var(--neon-blue);font-size:1.2rem;transition:transform 0.3s;}
+.faq-item.open .faq-q span{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.4s ease;}
+.faq-item.open .faq-a{max-height:200px;}
+.faq-a-inner{padding:0 24px 20px;font-size:0.83rem;color:rgba(200,232,255,0.6);line-height:1.7;border-top:1px solid rgba(0,212,255,0.08);}
+
+/* FOOTER */
+footer{
+  background:rgba(0,4,10,0.95);
+  border-top:1px solid rgba(0,212,255,0.08);
+  padding:60px 6vw 30px;
+}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:50px;}
+.footer-brand-name{font-family:var(--font-head);font-size:1.3rem;font-weight:900;color:#fff;letter-spacing:2px;margin-bottom:12px;}
+.footer-brand-name span{color:var(--neon-blue);}
+.footer-desc{font-size:0.8rem;color:rgba(200,232,255,0.45);line-height:1.7;margin-bottom:20px;}
+.footer-social{display:flex;gap:10px;}
+.fsoc{
+  width:36px;height:36px;border-radius:8px;
+  background:var(--glass);border:var(--border-glow);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;color:rgba(200,232,255,0.5);text-decoration:none;
+  transition:all 0.2s;
+}
+.fsoc:hover{border-color:rgba(0,212,255,0.4);color:var(--neon-blue);box-shadow:0 0 15px rgba(0,150,255,0.2);}
+.footer-col h4{font-family:var(--font-head);font-size:0.75rem;font-weight:700;color:#fff;letter-spacing:2px;margin-bottom:18px;}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.footer-col ul li a{font-size:0.8rem;color:rgba(200,232,255,0.45);text-decoration:none;transition:color 0.2s;}
+.footer-col ul li a:hover{color:var(--neon-blue);}
+.footer-bottom{
+  border-top:1px solid rgba(0,212,255,0.06);
+  padding-top:24px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+}
+.footer-bottom p{font-size:0.75rem;color:rgba(200,232,255,0.3);}
+.footer-founders{font-size:0.72rem;color:rgba(200,232,255,0.3);}
+.footer-founders span{color:var(--neon-blue);}
+
+/* ANIMATIONS */
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+@keyframes shimmer{0%{transform:translateX(-100%) rotate(45deg);}100%{transform:translateX(300%) rotate(45deg);}}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,255,234,0.4);}70%{opacity:0.8;box-shadow:0 0 0 8px rgba(0,255,234,0);}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+@keyframes borderGlowAnim{0%{border-color:rgba(0,212,255,0.2);}50%{border-color:rgba(0,212,255,0.5);}100%{border-color:rgba(0,212,255,0.2);}}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 0.7s ease,transform 0.7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* VPS TAB */
+.tab-btns{display:flex;gap:0;border-radius:12px;overflow:hidden;border:1px solid rgba(0,212,255,0.2);width:fit-content;margin:0 auto 48px;}
+.tab-btn{padding:12px 32px;border:none;cursor:pointer;font-family:var(--font-head);font-size:0.8rem;font-weight:700;letter-spacing:1px;transition:all 0.3s;background:transparent;color:rgba(200,232,255,0.5);}
+.tab-btn.active{background:linear-gradient(135deg,var(--accent),var(--neon-blue));color:#000;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .footer-grid{grid-template-columns:1fr 1fr;}
+  .panel-grid{grid-template-columns:1fr;}
+  .support-card{grid-template-columns:1fr;}
+}
+@media(max-width:700px){
+  .nav-links{display:none;}
+  .nav-hamburger{display:flex;}
+  .hero-h1{font-size:2rem;}
+  .footer-grid{grid-template-columns:1fr;}
+  .sale-banner{flex-direction:column;}
+  .status-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:480px){
+  .hero-btns{flex-direction:column;}
+  .btn-primary,.btn-secondary,.btn-discord{width:100%;justify-content:center;}
+  .counters-grid{grid-template-columns:1fr 1fr;}
+}
+
+/* MOBILE NAV */
+#mobile-nav{
+  position:fixed;inset:0;z-index:999;background:rgba(2,4,8,0.97);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
+  transform:translateX(100%);transition:transform 0.4s ease;
+}
+#mobile-nav.open{transform:translateX(0);}
+#mobile-nav a{font-family:var(--font-head);font-size:1.2rem;font-weight:700;color:#fff;text-decoration:none;letter-spacing:2px;transition:color 0.2s;}
+#mobile-nav a:hover{color:var(--neon-blue);}
+.mobile-close{position:absolute;top:24px;right:24px;background:none;border:none;cursor:pointer;font-size:1.5rem;color:rgba(200,232,255,0.5);}
+
+/* SECTION SEPARATOR */
+.sep{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,0.15),transparent);margin:20px 0;}
+
+/* ANIMATED GRADIENT BG ORBS */
+.orb{
+  position:absolute;border-radius:50%;filter:blur(80px);opacity:0.08;pointer-events:none;
+  animation:orbFloat 8s ease-in-out infinite alternate;
+}
+.orb1{width:600px;height:600px;background:radial-gradient(circle,var(--neon-blue),transparent);top:-20%;left:-10%;animation-delay:0s;}
+.orb2{width:400px;height:400px;background:radial-gradient(circle,var(--accent),transparent);top:40%;right:-5%;animation-delay:3s;}
+.orb3{width:300px;height:300px;background:radial-gradient(circle,var(--neon-cyan),transparent);bottom:10%;left:30%;animation-delay:6s;}
+@keyframes orbFloat{0%{transform:translate(0,0) scale(1);}100%{transform:translate(30px,40px) scale(1.1);}}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- LOADING SCREEN -->
+<div id="loader">
+  <div class="loader-particles" id="loader-particles"></div>
+  <div class="loader-logo">HDXCloud</div>
+  <div class="loader-sub">INITIALIZING SYSTEMS...</div>
+  <div class="loader-bar-wrap">
+    <div class="loader-bar"></div>
+  </div>
+  <div class="loader-pct" id="loader-pct">0%</div>
+</div>
+
+<!-- PARTICLES BACKGROUND -->
+<div id="particles-bg"></div>
+
+<!-- MOBILE NAV -->
+<div id="mobile-nav">
+  <button class="mobile-close" id="mobile-close">✕</button>
+  <a href="#hero" onclick="closeMobileNav()">HOME</a>
+  <a href="#plans" onclick="closeMobileNav()">PLANS</a>
+  <a href="#datacenter" onclick="closeMobileNav()">DATACENTERS</a>
+  <a href="#features" onclick="closeMobileNav()">FEATURES</a>
+  <a href="#panel" onclick="closeMobileNav()">PANEL</a>
+  <a href="#discord" onclick="closeMobileNav()">DISCORD</a>
+  <a href="https://discord.gg/xS5uYX8Sm" target="_blank" class="btn-discord-big" style="font-size:0.85rem;padding:12px 28px;">JOIN DISCORD</a>
+</div>
+
+<!-- NAVIGATION -->
+<nav id="navbar">
+  <div class="nav-brand">
+    <div class="nav-logo-glow">HDX</div>
+    <span class="nav-brand-name">HDX<span>Cloud</span></span>
+  </div>
+  <div class="nav-links">
+    <a href="#plans">PLANS</a>
+    <a href="#datacenter">DATACENTERS</a>
+    <a href="#features">FEATURES</a>
+    <a href="#panel">PANEL</a>
+    <a href="#status">STATUS</a>
+    <a href="#faq">FAQ</a>
+    <a href="https://hdxcloud.xyz" target="_blank">DASHBOARD</a>
+    <a href="https://discord.gg/xS5uYX8Sm" target="_blank" class="nav-cta">JOIN DISCORD</a>
+  </div>
+  <div class="nav-hamburger" id="hamburger" onclick="openMobileNav()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-overlay"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      ENTERPRISE HOSTING PLATFORM
+    </div>
+    <h1 class="hero-h1">Premium <span>Minecraft &<br>VPS</span> Hosting</h1>
+    <p class="hero-sub">Affordable high-performance hosting with enterprise hardware, advanced DDoS protection, and global infrastructure — built for gamers and professionals.</p>
+    <div class="hero-btns">
+      <a href="#plans" class="btn-primary"><span>🚀 Get Started</span></a>
+      <a href="#plans" class="btn-secondary">View Plans</a>
+      <a href="https://discord.gg/xS5uYX8Sm" target="_blank" class="btn-discord">🎮 Join Discord</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat">
+        <div class="hstat-num"><span class="cnt" data-target="500">0</span>+</div>
+        <div class="hstat-lbl">ACTIVE CUSTOMERS</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num"><span class="cnt" data-target="1200">0</span>+</div>
+        <div class="hstat-lbl">SERVERS DEPLOYED</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num"><span class="cnt" data-target="7">0</span></div>
+        <div class="hstat-lbl">GLOBAL NODES</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num"><span class="cnt" data-target="99">0</span>.<span style="color:var(--neon-blue)">9</span>%</div>
+        <div class="hstat-lbl">UPTIME SLA</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLASH SALE -->
+<div id="flash-sale" class="section-pad" style="padding-top:40px;padding-bottom:20px;">
+  <div class="sale-banner reveal">
+    <div class="sale-left">
+      <div class="sale-fire">🔥</div>
+      <div class="sale-text">
+        <h3>AFFORDABLE PREMIUM HOSTING</h3>
+        <p>Starting From ₹30/month — Enterprise Quality at Unbeatable Prices</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      <div class="countdown">
+        <div class="cd-item"><div class="cd-num" id="cd-h">23</div><div class="cd-lbl">HRS</div></div>
+        <div class="cd-item"><div class="cd-num" id="cd-m">59</div><div class="cd-lbl">MIN</div></div>
+        <div class="cd-item"><div class="cd-num" id="cd-s">59</div><div class="cd-lbl">SEC</div></div>
+      </div>
+      <a href="#plans" class="btn-primary"><span>Grab Deal →</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS SECTION -->
+<section id="status" class="section-pad">
+  <div class="section-head reveal">
+    <div class="tag">LIVE STATUS</div>
+    <h2>System <span>Status</span></h2>
+    <p>Real-time monitoring across all our global infrastructure nodes</p>
+  </div>
+  <div class="status-grid reveal">
+    <div class="status-card">
+      <div class="status-card-header">
+        <span class="status-label">NETWORK</span>
+        <span class="status-dot"></span>
+      </div>
+      <div class="status-value">OPTIMAL <span>✓</span></div>
+      <div class="status-desc">All routes operational</div>
+    </div>
+    <div class="status-card">
+      <div class="status-card-header">
+        <span class="status-label">UPTIME</span>
+        <span class="status-dot"></span>
+      </div>
+      <div class="status-value">99.9% <span>↑</span></div>
+      <div class="status-desc">Last 30 days</div>
+    </div>
+    <div class="status-card">
+      <div class="status-card-header">
+        <span class="status-label">LATENCY</span>
+        <span class="status-dot"></span>
+      </div>
+      <div class="status-value">&lt;5ms <span>⚡</span></div>
+      <div class="status-desc">Average response time</div>
+    </div>
+    <div class="status-card">
+      <div class="status-card-header">
+        <span class="status-label">DDoS SHIELD</span>
+        <span class="status-dot"></span>
+      </div>
+      <div class="status-value">ACTIVE <span>🛡</span></div>
+      <div class="status-desc">Enterprise protection live</div>
+    </div>
+    <div class="status-card">
+      <div class="status-card-header">
+        <span class="status-label">NODES</span>
+        <span class="status-dot"></span>
+      </div>
+      <div class="status-value">7/7 <span>●</span></div>
+      <div class="status-desc">All nodes online</div>
+    </div>
+    <div class="status-card">
+      <div class="status-card-header">
+        <span class="status-label">SUPPORT</span>
+        <span class="status-dot"></span>
+      </div>
+      <div class="status-value">24/7 <span>💬</span></div>
+      <div class="status-desc">Always available</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOSTING PLANS -->
+<section id="plans" class="section-pad" style="background:rgba(0,5,15,0.4);">
+  <div class="section-head reveal">
+    <div class="tag">PRICING</div>
+    <h2>Choose Your <span>Hosting Plan</span></h2>
+    <p>Premium performance at prices everyone can afford</p>
+  </div>
+
+  <div class="tab-btns reveal">
+    <button class="tab-btn active" onclick="switchTab('minecraft')">🎮 MINECRAFT</button>
+    <button class="tab-btn" onclick="switchTab('vps')">⚡ VPS</button>
+  </div>
+
+  <!-- MINECRAFT PLANS -->
+  <div class="tab-panel active" id="tab-minecraft">
+    <div class="plans-grid reveal">
+      <div class="plan-card">
+        <div class="plan-tier">TIER 1</div>
+        <div class="plan-name">🌿 Grass</div>
+        <div class="plan-price"><span class="amt"><span>₹</span>30</span><span class="period">/month</span></div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>1GB DDR4 RAM</li>
+          <li>10GB SSD Storage</li>
+          <li>1 vCore CPU</li>
+          <li>Basic DDoS Protection</li>
+          <li>1 Server</li>
+          <li>Pterodactyl Panel</li>
+        </ul>
+        <a href="https://hdxcloud.xyz" target="_blank" class="plan-btn">BUY NOW</a>
+      </div>
+      <div class="plan-card">
+        <div class="plan-tier">TIER 2</div>
+        <div class="plan-name">🪨 Stone</div>
+        <div class="plan-price"><span class="amt"><span>₹</span>79</span><span class="period">/month</span></div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>2GB DDR4 RAM</li>
+          <li>20GB SSD Storage</li>
+          <li>2 vCore CPU</li>
+          <li>DDoS Protection</li>
+          <li>2 Servers</li>
+          <li>Plugin Support</li>
+        </ul>
+        <a href="https://hdxcloud.xyz" target="_blank" class="plan-btn">BUY NOW</a>
+      </div>
+      <div class="plan-card">
+        <div class="plan-tier">TIER 3</div>
+        <div class="plan-name">⚙️ Iron</div>
+        <div class="plan-price"><span class="amt"><span>₹</span>149</span><span class="period">/month</span></div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>4GB DDR4 RAM</li>
+          <li>40GB NVMe SSD</li>
+          <li>2 vCore CPU</li>
+          <li>Advanced DDoS</li>
+          <li>Modpack Support</li>
+          <li>Automated Backups</li>
+        </ul>
+        <a href="https://hdxcloud.xyz" target="_blank" class="plan-btn">BUY NOW</a>
+      </div>
+      <div class="plan-card popular">
+        <div class="popular-badge">MOST POPULAR</div>
+        <div class="plan-tier">TIER 4</div>
+        <div class="plan-name">💎 Diamond</div>
+        <div class="plan-price"><span class="amt"><span>₹</span>349</span><span class="period">/month</span></div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>8GB DDR4 RAM</li>
+          <li>80GB NVMe SSD</li>
+          <li>4 vCore Ryzen</li>
+          <li>Enterprise DDoS</li>
+          <li>Premium Routing</li>
+          <li>Priority Support</li>
+        </ul>
+        <a href="https://hdxcloud.xyz" target="_blank" class="plan-btn">BUY NOW</a>
+      </div>
+      <div class="plan-card">
+        <div class="plan-tier">TIER 5</div>
+        <div class="plan-name">🔱 Netherite</div>
+        <div class="plan-price"><span class="amt"><span>₹</span>600</span><span class="period">/month</span></div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>16GB DDR5 RAM</li>
+          <li>160GB NVMe SSD</li>
+          <li>6 vCore Ryzen</li>
+          <li>Max DDoS Protection</li>
+          <li>Dedicated Resources</li>
+          <li>24/7 Priority Support</li>
+        </ul>
+        <a href="https://hdxcloud.xyz" target="_blank" class="plan-btn">BUY NOW</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- VPS PLANS -->
+  <div class="tab-panel" id="tab-vps">
+    <div class="plans-grid reveal">
+      <div class="plan-card">
+        <div class="plan-tier">VPS 1</div>
+        <div class="plan-name">⚡ Nano</div>
+        <div class="plan-price"><span class="amt"><span>₹</span>60</span><span class="period">/month</span></div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>1 vCore CPU</li>
+          <li>1GB DDR4 RAM</li>
+          <li>20GB SSD Storage</li>
+          <li>1Gbps Network</li>
+          <li>Basic DDoS Protection</li>
+          <li>Linux Support</li>
+          <li>Instant Setup</li>
+        </ul>
+        <a href="https://hdxcloud.xyz" target="_blank" class="plan-btn">DEPLOY NOW</a>
+      </div>
+      <div class="plan-card">
+        <div class="plan-tier">VPS 2</div>
+        <div class="plan-name">🔷 Basic</div>
+        <div class="plan-price"><span class="amt"><span>₹</span>149</span><span class="period">/month</span></div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>2 vCore CPU</li>
+          <li>2GB DDR4 RAM</li>
+          <li>40GB NVMe SSD</li>
+          <li>Better CPU Priority</li>
+          <li>DDoS Protection</li>
+          <li>Full Root Access</li>
+          <li>Instant Deployment</li>
+        </ul>
+        <a href="https://hdxcloud.xyz" target="_blank" class="plan-btn">DEPLOY NOW</a>
+      </div>
+      <div class="plan-card">
+        <div class="plan-tier">VPS 3</div>
+        <div class="plan-name">🔶 Plus</div>
+        <div class="plan-price"><span class="amt"><span>₹</span>349</span><span class="period">/month</span></div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>4 vCore CPU</li>
+          <li>8GB DDR4 RAM</li>
+          <li>80GB NVMe SSD</li>
+          <li>Premium Routing</li>
+          <li>Advanced Protection</li>
+          <li>Full Root Access</li>
+          <li>Better Performance</li>
+        </ul>
+        <a href="https://hdxcloud.xyz" target="_blank" class="plan-btn">DEPLOY NOW</a>
+      </div>
+      <div class="plan-card popular">
+        <div class="popular-badge">BEST VALUE</div>
+        <div class="plan-tier">VPS 4</div>
+        <div class="plan-name">💠 Pro</div>
+        <div class="plan-price"><span class="amt"><span>₹</span>699</span><span class="period">/month</span></div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>6 vCore CPU</li>
+          <li>16GB DDR4 RAM</li>
+          <li>160GB NVMe SSD</li>
+          <li>Ryzen Performance</li>
+          <li>Enterprise DDoS</li>
+          <li>Premium Network</li>
+          <li>Priority Support</li>
+        </ul>
+        <a href="https://hdxcloud.xyz" target="_blank" class="plan-btn">DEPLOY NOW</a>
+      </div>
+      <div class="plan-card">
+        <div class="plan-tier">VPS 5</div>
+        <div class="plan-name">🌟 Ultra</div>
+        <div class="plan-price"><span class="amt"><span>₹</span>1200</span><span class="period">/month</span></div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>8 vCore CPU</li>
+          <li>32GB DDR5 RAM</li>
+          <li>320GB NVMe SSD</li>
+          <li>Premium Ryzen CPU</li>
+          <li>Advanced DDoS</li>
+          <li>Priority Routing</li>
+          <li>Dedicated Resources</li>
+        </ul>
+        <a href="https://hdxcloud.xyz" target="_blank" class="plan-btn">DEPLOY NOW</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MINECRAFT VERSION SUPPORT -->
+<section id="mc-versions" class="section-pad">
+  <div class="section-head reveal">
+    <div class="tag">COMPATIBILITY</div>
+    <h2>Minecraft <span>Version Support</span></h2>
+    <p>Every major version and server type — we've got you covered</p>
+  </div>
+  <div class="mc-versions reveal">
+    <span class="mc-badge">1.8.x</span><span class="mc-badge">1.12.x</span><span class="mc-badge">1.16.x</span>
+    <span class="mc-badge">1.18.x</span><span class="mc-badge">1.19.x</span><span class="mc-badge">1.20.x</span>
+    <span class="mc-badge">1.21.x</span>
+  </div>
+  <div class="mc-types reveal">
+    <div class="mc-type"><div class="mc-type-icon">📄</div><div class="mc-type-name">Paper</div></div>
+    <div class="mc-type"><div class="mc-type-icon">⚙️</div><div class="mc-type-name">Spigot</div></div>
+    <div class="mc-type"><div class="mc-type-icon">🔮</div><div class="mc-type-name">Purpur</div></div>
+    <div class="mc-type"><div class="mc-type-icon">🔨</div><div class="mc-type-name">Forge</div></div>
+    <div class="mc-type"><div class="mc-type-icon">🧵</div><div class="mc-type-name">Fabric</div></div>
+    <div class="mc-type"><div class="mc-type-icon">🌐</div><div class="mc-type-name">BungeeCord</div></div>
+    <div class="mc-type"><div class="mc-type-icon">⚡</div><div class="mc-type-name">Velocity</div></div>
+    <div class="mc-type"><div class="mc-type-icon">🎯</div><div class="mc-type-name">Vanilla</div></div>
+  </div>
+</section>
+
+<!-- INFRASTRUCTURE -->
+<section id="infra" class="section-pad" style="background:rgba(0,5,15,0.5);">
+  <div class="section-head reveal">
+    <div class="tag">INFRASTRUCTURE</div>
+    <h2>Enterprise-Grade <span>Hardware</span></h2>
+    <p>Powered by the latest Ryzen CPUs, NVMe storage, and premium networking</p>
+  </div>
+  <div class="infra-grid reveal">
+    <div class="infra-card">
+      <div class="infra-icon">🔴</div>
+      <h3>AMD Ryzen CPUs</h3>
+      <p>Latest Ryzen generation for maximum per-core performance</p>
+    </div>
+    <div class="infra-card">
+      <div class="infra-icon">💾</div>
+      <h3>NVMe SSD Storage</h3>
+      <p>Up to 7,000 MB/s read speeds with enterprise-grade NVMe</p>
+    </div>
+    <div class="infra-card">
+      <div class="infra-icon">🧠</div>
+      <h3>DDR4/DDR5 RAM</h3>
+      <p>High-frequency memory for seamless server performance</p>
+    </div>
+    <div class="infra-card">
+      <div class="infra-icon">🛡️</div>
+      <h3>Advanced DDoS Shield</h3>
+      <p>Multi-layer protection filtering up to 1 Tbps of attack traffic</p>
+    </div>
+    <div class="infra-card">
+      <div class="infra-icon">🌐</div>
+      <h3>Premium Routing</h3>
+      <p>BGP anycast routing for the lowest possible latency worldwide</p>
+    </div>
+    <div class="infra-card">
+      <div class="infra-icon">⚡</div>
+      <h3>Low Latency Network</h3>
+      <p>Sub-5ms latency with direct peering to major ISPs globally</p>
+    </div>
+  </div>
+</section>
+
+<!-- DATACENTER / WORLD MAP -->
+<section id="datacenter" class="section-pad">
+  <div class="section-head reveal">
+    <div class="tag">GLOBAL NETWORK</div>
+    <h2>Worldwide <span>Infrastructure</span></h2>
+    <p>7 strategic datacenter locations across 4 continents for minimum latency</p>
+  </div>
+  <div class="reveal" style="position:relative;border-radius:20px;overflow:hidden;border:1px solid rgba(0,212,255,0.15);background:rgba(0,8,18,0.8);">
+    <canvas id="world-map-canvas" style="width:100%;display:block;"></canvas>
+  </div>
+  <div class="dc-locations reveal">
+    <div class="dc-loc">
+      <div class="dc-loc-dot"></div>
+      <div>
+        <div class="dc-loc-name">🇮🇳 India</div>
+        <div class="dc-loc-stats">
+          <div class="dc-loc-stat">Ping: <span>&lt;15ms</span></div>
+          <div class="dc-loc-stat">Protection: <span>ACTIVE</span></div>
+          <div class="dc-loc-stat">Uptime: <span>99.9%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="dc-loc">
+      <div class="dc-loc-dot"></div>
+      <div>
+        <div class="dc-loc-name">🇸🇬 Singapore</div>
+        <div class="dc-loc-stats">
+          <div class="dc-loc-stat">Ping: <span>&lt;20ms</span></div>
+          <div class="dc-loc-stat">Protection: <span>ACTIVE</span></div>
+          <div class="dc-loc-stat">Uptime: <span>99.9%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="dc-loc">
+      <div class="dc-loc-dot"></div>
+      <div>
+        <div class="dc-loc-name">🇦🇪 Dubai</div>
+        <div class="dc-loc-stats">
+          <div class="dc-loc-stat">Ping: <span>&lt;25ms</span></div>
+          <div class="dc-loc-stat">Protection: <span>ACTIVE</span></div>
+          <div class="dc-loc-stat">Uptime: <span>99.9%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="dc-loc">
+      <div class="dc-loc-dot"></div>
+      <div>
+        <div class="dc-loc-name">🇲🇦 Morocco</div>
+        <div class="dc-loc-stats">
+          <div class="dc-loc-stat">Ping: <span>&lt;30ms</span></div>
+          <div class="dc-loc-stat">Protection: <span>ACTIVE</span></div>
+          <div class="dc-loc-stat">Uptime: <span>99.9%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="dc-loc">
+      <div class="dc-loc-dot"></div>
+      <div>
+        <div class="dc-loc-name">🇩🇪 Europe</div>
+        <div class="dc-loc-stats">
+          <div class="dc-loc-stat">Ping: <span>&lt;10ms</span></div>
+          <div class="dc-loc-stat">Protection: <span>ACTIVE</span></div>
+          <div class="dc-loc-stat">Uptime: <span>99.9%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="dc-loc">
+      <div class="dc-loc-dot"></div>
+      <div>
+        <div class="dc-loc-name">🇺🇸 USA</div>
+        <div class="dc-loc-stats">
+          <div class="dc-loc-stat">Ping: <span>&lt;20ms</span></div>
+          <div class="dc-loc-stat">Protection: <span>ACTIVE</span></div>
+          <div class="dc-loc-stat">Uptime: <span>99.9%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="dc-loc">
+      <div class="dc-loc-dot"></div>
+      <div>
+        <div class="dc-loc-name">🌏 East Asia</div>
+        <div class="dc-loc-stats">
+          <div class="dc-loc-stat">Ping: <span>&lt;18ms</span></div>
+          <div class="dc-loc-stat">Protection: <span>ACTIVE</span></div>
+          <div class="dc-loc-stat">Uptime: <span>99.9%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PANEL SHOWCASE -->
+<section id="panel" class="section-pad" style="background:rgba(0,5,15,0.5);">
+  <div class="section-head reveal">
+    <div class="tag">CONTROL PANEL</div>
+    <h2>Powerful <span>Admin Panel</span></h2>
+    <p>Manage everything from one premium dashboard — no technical experience needed</p>
+  </div>
+  <div class="panel-showcase reveal">
+    <div class="panel-topbar">
+      <div class="panel-dot red"></div>
+      <div class="panel-dot yellow"></div>
+      <div class="panel-dot green"></div>
+      <div class="panel-title">HDXCloud Control Panel — Premium Dashboard</div>
+    </div>
+    <div class="panel-grid">
+      <div class="panel-widget">
+        <div class="panel-widget-head">LIVE CONSOLE <span class="panel-online">● ONLINE</span></div>
+        <div class="panel-console">
+          <div class="console-line green">[INFO] Server started successfully</div>
+          <div class="console-line">[INFO] Loading world...</div>
+          <div class="console-line cyan">[INFO] Plugins loaded: 24</div>
+          <div class="console-line">[INFO] Done (1.2s)</div>
+          <div class="console-line yellow">[WARN] Player joined: Steve</div>
+          <div class="console-line green">[INFO] TPS: 20.0 | Players: 12</div>
+        </div>
+        <div class="panel-controls">
+          <button class="pctrl start">▶ START</button>
+          <button class="pctrl stop">■ STOP</button>
+          <button class="pctrl restart">↻ RESTART</button>
+        </div>
+      </div>
+      <div class="panel-widget">
+        <div class="panel-widget-head">CPU USAGE</div>
+        <div class="graph-bar">
+          <div class="gb" style="--h:40%;height:40%;"></div>
+          <div class="gb" style="--h:65%;height:65%;"></div>
+          <div class="gb" style="--h:55%;height:55%;"></div>
+          <div class="gb" style="--h:80%;height:80%;"></div>
+          <div class="gb" style="--h:45%;height:45%;"></div>
+          <div class="gb" style="--h:70%;height:70%;"></div>
+          <div class="gb" style="--h:60%;height:60%;"></div>
+          <div class="gb" style="--h:50%;height:50%;"></div>
+          <div class="gb" style="--h:75%;height:75%;"></div>
+          <div class="gb" style="--h:55%;height:55%;"></div>
+          <div class="gb" style="--h:35%;height:35%;"></div>
+          <div class="gb" style="--h:62%;height:62%;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;">
+          <span style="font-family:var(--font-mono);font-size:0.65rem;color:rgba(200,232,255,0.4);">AVG: 58%</span>
+          <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--neon-cyan);">RYZEN™</span>
+        </div>
+      </div>
+      <div class="panel-widget">
+        <div class="panel-widget-head">RAM USAGE</div>
+        <div style="margin:8px 0;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:0.72rem;color:rgba(200,232,255,0.5);">Used</span>
+            <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--neon-blue);">3.2GB / 8GB</span>
+          </div>
+          <div style="height:8px;background:rgba(0,212,255,0.1);border-radius:4px;overflow:hidden;">
+            <div style="width:40%;height:100%;background:linear-gradient(90deg,var(--accent),var(--neon-blue));border-radius:4px;box-shadow:0 0 10px rgba(0,150,255,0.4);"></div>
+          </div>
+        </div>
+        <div style="margin:8px 0;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:0.72rem;color:rgba(200,232,255,0.5);">Storage</span>
+            <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--neon-cyan);">22GB / 80GB</span>
+          </div>
+          <div style="height:8px;background:rgba(0,212,255,0.1);border-radius:4px;overflow:hidden;">
+            <div style="width:27%;height:100%;background:linear-gradient(90deg,var(--neon-cyan),#00aaff);border-radius:4px;"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+          <span style="padding:4px 10px;border-radius:6px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.15);font-family:var(--font-mono);font-size:0.6rem;color:var(--neon-blue);">BACKUPS</span>
+          <span style="padding:4px 10px;border-radius:6px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.15);font-family:var(--font-mono);font-size:0.6rem;color:var(--neon-blue);">FILES</span>
+          <span style="padding:4px 10px;border-radius:6px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.15);font-family:var(--font-mono);font-size:0.6rem;color:var(--neon-blue);">PLUGINS</span>
+          <span style="padding:4px 10px;border-radius:6px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.15);font-family:var(--font-mono);font-size:0.6rem;color:var(--neon-blue);">INSTALLER</span>
+        </div>
+      </div>
+      <div class="panel-widget">
+        <div class="panel-widget-head">REAL-TIME ANALYTICS</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="text-align:center;padding:12px;background:rgba(0,212,255,0.04);border-radius:8px;">
+            <div class="panel-stat">18 <span>online</span></div>
+            <div style="font-size:0.65rem;color:rgba(200,232,255,0.4);margin-top:2px;">PLAYERS</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:rgba(0,212,255,0.04);border-radius:8px;">
+            <div class="panel-stat">20.0 <span>tps</span></div>
+            <div style="font-size:0.65rem;color:rgba(200,232,255,0.4);margin-top:2px;">SERVER TPS</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:rgba(0,212,255,0.04);border-radius:8px;">
+            <div class="panel-stat">4ms <span>ping</span></div>
+            <div style="font-size:0.65rem;color:rgba(200,232,255,0.4);margin-top:2px;">LATENCY</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:rgba(0,212,255,0.04);border-radius:8px;">
+            <div class="panel-stat">24 <span>h</span></div>
+            <div style="font-size:0.65rem;color:rgba(200,232,255,0.4);margin-top:2px;">UPTIME</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="section-pad">
+  <div class="section-head reveal">
+    <div class="tag">FEATURES</div>
+    <h2>Everything You <span>Need</span></h2>
+    <p>Enterprise features included in every plan, no extra charges</p>
+  </div>
+  <div class="features-grid reveal">
+    <div class="feat-card">
+      <div class="feat-icon">💾</div>
+      <h3>NVMe SSD Storage</h3>
+      <p>Blazing-fast NVMe drives with 7GB/s read speeds for instant world loading</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔴</div>
+      <h3>AMD Ryzen CPUs</h3>
+      <p>Latest generation Ryzen processors for maximum single-thread performance</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⚡</div>
+      <h3>Instant Setup</h3>
+      <p>Your server is live within 60 seconds of payment — no waiting</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🛡️</div>
+      <h3>Enterprise DDoS Shield</h3>
+      <p>Multi-layer protection filtering terabits of attack traffic automatically</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">💿</div>
+      <h3>Automated Backups</h3>
+      <p>Scheduled backups with one-click restore — never lose your world</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🌐</div>
+      <h3>Low Latency Network</h3>
+      <p>Premium BGP routing with direct ISP peering for sub-5ms response</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🖱️</div>
+      <h3>One-Click Install</h3>
+      <p>Install Paper, Forge, Fabric, and more with a single click from our panel</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🧩</div>
+      <h3>Modpack & Plugin Support</h3>
+      <p>Full support for all major modpacks, plugins, and custom configurations</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🌍</div>
+      <h3>Global Infrastructure</h3>
+      <p>7 datacenter locations for ultra-low latency anywhere on Earth</p>
+    </div>
+  </div>
+</section>
+
+<!-- COUNTERS -->
+<section id="counters" class="section-pad" style="background:rgba(0,5,15,0.5);">
+  <div class="counters-grid reveal">
+    <div class="counter-card">
+      <div class="counter-num"><span class="cnt" data-target="500">0</span><span>+</span></div>
+      <div class="counter-lbl">ACTIVE CUSTOMERS</div>
+    </div>
+    <div class="counter-card">
+      <div class="counter-num"><span class="cnt" data-target="1200">0</span><span>+</span></div>
+      <div class="counter-lbl">RUNNING SERVERS</div>
+    </div>
+    <div class="counter-card">
+      <div class="counter-num"><span class="cnt" data-target="7">0</span></div>
+      <div class="counter-lbl">GLOBAL NODES</div>
+    </div>
+    <div class="counter-card">
+      <div class="counter-num"><span class="cnt" data-target="3500">0</span><span>+</span></div>
+      <div class="counter-lbl">TICKETS RESOLVED</div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews" class="section-pad">
+  <div class="section-head reveal">
+    <div class="tag">TESTIMONIALS</div>
+    <h2>Loved by <span>Customers</span></h2>
+    <p>Join hundreds of satisfied server owners worldwide</p>
+  </div>
+  <div class="reviews-track reveal">
+    <div class="reviews-inner" id="reviews-inner">
+      <!-- duplicated for infinite scroll -->
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Incredibly fast setup and amazing performance. My Minecraft server has never run this smoothly. DDoS protection is top-notch!"</div><div class="review-author"><div class="review-avatar">SR</div><div><div class="review-name">SkyRaid_MC</div><div class="review-role">Server Owner</div></div></div></div>
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Best hosting for the price in India. Got the Diamond plan and my 50-player network runs flawlessly. Support team is fantastic."</div><div class="review-author"><div class="review-avatar">PK</div><div><div class="review-name">PvPKing</div><div class="review-role">Network Admin</div></div></div></div>
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Switched from another provider and the difference is night and day. Zero lag, instant response from support. Highly recommend!"</div><div class="review-author"><div class="review-avatar">ZX</div><div><div class="review-name">ZephyrXD</div><div class="review-role">Community Leader</div></div></div></div>
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"The VPS plans are perfect for our game server network. Premium Ryzen CPUs make all the difference in performance."</div><div class="review-author"><div class="review-avatar">AV</div><div><div class="review-name">ApexVoid</div><div class="review-role">Developer</div></div></div></div>
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Affordable pricing with enterprise quality. The panel is clean and easy to use. My players love the low ping!"</div><div class="review-author"><div class="review-avatar">NX</div><div><div class="review-name">NeonXcraft</div><div class="review-role">Server Owner</div></div></div></div>
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"24/7 support actually responds in minutes. Had an issue at 3am and it was resolved almost instantly. Incredible service."</div><div class="review-author"><div class="review-avatar">DW</div><div><div class="review-name">DawnWolf</div><div class="review-role">SMP Owner</div></div></div></div>
+      <!-- Duplicate for seamless loop -->
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Incredibly fast setup and amazing performance. My Minecraft server has never run this smoothly. DDoS protection is top-notch!"</div><div class="review-author"><div class="review-avatar">SR</div><div><div class="review-name">SkyRaid_MC</div><div class="review-role">Server Owner</div></div></div></div>
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Best hosting for the price in India. Got the Diamond plan and my 50-player network runs flawlessly. Support team is fantastic."</div><div class="review-author"><div class="review-avatar">PK</div><div><div class="review-name">PvPKing</div><div class="review-role">Network Admin</div></div></div></div>
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Switched from another provider and the difference is night and day. Zero lag, instant response from support. Highly recommend!"</div><div class="review-author"><div class="review-avatar">ZX</div><div><div class="review-name">ZephyrXD</div><div class="review-role">Community Leader</div></div></div></div>
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"The VPS plans are perfect for our game server network. Premium Ryzen CPUs make all the difference in performance."</div><div class="review-author"><div class="review-avatar">AV</div><div><div class="review-name">ApexVoid</div><div class="review-role">Developer</div></div></div></div>
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Affordable pricing with enterprise quality. The panel is clean and easy to use. My players love the low ping!"</div><div class="review-author"><div class="review-avatar">NX</div><div><div class="review-name">NeonXcraft</div><div class="review-role">Server Owner</div></div></div></div>
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"24/7 support actually responds in minutes. Had an issue at 3am and it was resolved almost instantly. Incredible service."</div><div class="review-author"><div class="review-avatar">DW</div><div><div class="review-name">DawnWolf</div><div class="review-role">SMP Owner</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PAYMENT METHODS -->
+<section id="payment" class="section-pad" style="background:rgba(0,5,15,0.5);">
+  <div class="section-head reveal">
+    <div class="tag">PAYMENTS</div>
+    <h2>Flexible <span>Payment Options</span></h2>
+    <p>Pay the way you prefer — we support all major payment methods</p>
+  </div>
+  <div class="payment-grid reveal">
+    <div class="pay-card"><div class="pay-icon">📱</div>UPI</div>
+    <div class="pay-card"><div class="pay-icon">💳</div>Paytm</div>
+    <div class="pay-card"><div class="pay-icon">📲</div>PhonePe</div>
+    <div class="pay-card"><div class="pay-icon">🔵</div>Google Pay</div>
+    <div class="pay-card"><div class="pay-icon">🅿️</div>PayPal</div>
+    <div class="pay-card"><div class="pay-icon">₿</div>Crypto</div>
+    <div class="pay-card"><div class="pay-icon">💳</div>Debit Card</div>
+    <div class="pay-card"><div class="pay-icon">💳</div>Credit Card</div>
+  </div>
+</section>
+
+<!-- AI SUPPORT -->
+<section id="support" class="section-pad">
+  <div class="section-head reveal">
+    <div class="tag">SUPPORT</div>
+    <h2>AI-Powered <span>Support</span></h2>
+    <p>Get instant help 24/7 from our AI assistant or human support team</p>
+  </div>
+  <div class="support-card reveal">
+    <div>
+      <h3 style="font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:16px;">Always Here When You Need Help</h3>
+      <p style="font-size:0.85rem;color:rgba(200,232,255,0.6);line-height:1.7;margin-bottom:24px;">Our support system combines AI-powered instant responses with human experts available around the clock.</p>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:28px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1rem;">⚡</div>
+          <div>
+            <div style="font-size:0.85rem;font-weight:600;color:#fff;">Instant Response</div>
+            <div style="font-size:0.75rem;color:rgba(200,232,255,0.4);">AI answers common questions in seconds</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1rem;">🎫</div>
+          <div>
+            <div style="font-size:0.85rem;font-weight:600;color:#fff;">Ticket System</div>
+            <div style="font-size:0.75rem;color:rgba(200,232,255,0.4);">Human experts resolve complex issues</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1rem;">📚</div>
+          <div>
+            <div style="font-size:0.85rem;font-weight:600;color:#fff;">Knowledge Base</div>
+            <div style="font-size:0.75rem;color:rgba(200,232,255,0.4);">Hundreds of guides and tutorials</div>
+          </div>
+        </div>
+      </div>
+      <a href="https://discord.gg/xS5uYX8Sm" target="_blank" class="btn-primary" style="display:inline-flex;"><span>Get Support →</span></a>
+    </div>
+    <div class="support-chat">
+      <div style="font-family:var(--font-mono);font-size:0.65rem;color:rgba(200,232,255,0.3);letter-spacing:2px;margin-bottom:16px;display:flex;align-items:center;gap:6px;">
+        <span style="width:6px;height:6px;background:#00ff88;border-radius:50%;display:inline-block;box-shadow:0 0 6px #00ff88;"></span>
+        HDX SUPPORT — ONLINE
+      </div>
+      <div class="chat-msg">
+        <div class="chat-avatar bot">AI</div>
+        <div class="chat-bubble">Hi! Welcome to HDXCloud support. How can I assist you today? 👋</div>
+      </div>
+      <div class="chat-msg" style="justify-content:flex-end;">
+        <div class="chat-bubble user-bubble">How fast is server setup?</div>
+        <div class="chat-avatar user">U</div>
+      </div>
+      <div class="chat-msg">
+        <div class="chat-avatar bot">AI</div>
+        <div class="chat-bubble">Your server goes live within 60 seconds of payment! No manual setup required — fully automated instant deployment. ⚡</div>
+      </div>
+      <div class="chat-msg" style="justify-content:flex-end;">
+        <div class="chat-bubble user-bubble">Is DDoS protection included?</div>
+        <div class="chat-avatar user">U</div>
+      </div>
+      <div class="chat-msg">
+        <div class="chat-avatar bot">AI</div>
+        <div class="chat-bubble">Yes! Enterprise DDoS protection is included in ALL plans at no extra cost. 🛡️</div>
+      </div>
+      <div class="chat-input">
+        <input type="text" placeholder="Ask anything..." readonly>
+        <button class="chat-send">SEND</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DISCORD -->
+<section id="discord" class="section-pad" style="background:rgba(0,5,15,0.4);">
+  <div class="discord-card reveal">
+    <div class="discord-logo">🎮</div>
+    <h2>Join the HDXCloud <span style="background:linear-gradient(135deg,#5865f2,#7289da);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Community</span></h2>
+    <p>Get support, stay updated with announcements, connect with other server owners, and get exclusive deals — all on our Discord</p>
+    <div class="discord-stats">
+      <div class="dstat"><div class="dstat-num">500+</div><div class="dstat-lbl">MEMBERS</div></div>
+      <div class="dstat"><div class="dstat-num">24/7</div><div class="dstat-lbl">SUPPORT</div></div>
+      <div class="dstat"><div class="dstat-num">100%</div><div class="dstat-lbl">FREE</div></div>
+    </div>
+    <a href="https://discord.gg/xS5uYX8Sm" target="_blank" class="btn-discord-big">🎮 JOIN DISCORD SERVER</a>
+  </div>
+</section>
+
+<!-- PARTNERS / TRUST -->
+<section id="partners" class="section-pad">
+  <div class="section-head reveal">
+    <div class="tag">TRUSTED BY</div>
+    <h2>Our <span>Partners & Trust</span></h2>
+  </div>
+  <div class="partners-row reveal">
+    <div class="partner-card">CLOUDFLARE</div>
+    <div class="partner-card">AKAMAI</div>
+    <div class="partner-card">LINUX FOUNDATION</div>
+    <div class="partner-card">AMD RYZEN</div>
+    <div class="partner-card">PTERODACTYL</div>
+    <div class="partner-card">LETS ENCRYPT</div>
+    <div class="partner-card">OVHCLOUD</div>
+    <div class="partner-card">HETZNER</div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="section-pad" style="background:rgba(0,5,15,0.4);">
+  <div class="section-head reveal">
+    <div class="tag">FAQ</div>
+    <h2>Frequently Asked <span>Questions</span></h2>
+    <p>Everything you need to know before getting started</p>
+  </div>
+  <div class="faq-list reveal">
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How fast is server setup after payment? <span>+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Your server is provisioned and online within 60 seconds of payment confirmation. Our fully automated deployment system handles everything instantly — no waiting, no manual setup required.</div></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Which datacenter locations are available? <span>+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">We have 7 global locations: India, Singapore, Dubai, Morocco, Europe (Germany), USA, and East Asia. You can choose the closest location to your player base for minimum latency.</div></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Are the plans really affordable? <span>+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Absolutely! Our Minecraft hosting starts at just ₹30/month and VPS from ₹60/month. We believe premium hosting shouldn't cost a fortune — enterprise quality at budget prices.</div></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Do you support mods and plugins? <span>+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Yes! We support all major server types including Paper, Spigot, Purpur, Forge, Fabric, BungeeCord, and Velocity. Install plugins and mods with one click through our panel.</div></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Is DDoS protection included in all plans? <span>+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Yes, enterprise-grade DDoS protection is included in every single plan at no additional cost. Higher-tier plans get enhanced multi-layer protection with faster mitigation response times.</div></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Can I upgrade my plan later? <span>+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Absolutely. You can upgrade or downgrade your plan at any time from the dashboard. Upgrades are instant with no downtime — your server continues running during the transition.</div></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Is 24/7 support available? <span>+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Yes! Our support team is available 24/7 via Discord and our ticketing system. AI support provides instant responses, with human escalation available for complex issues at any hour.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div class="nav-logo-glow" style="width:32px;height:32px;font-size:0.8rem;">HDX</div>
+        <div class="footer-brand-name">HDX<span>Cloud</span></div>
+      </div>
+      <p class="footer-desc">Premium Minecraft and VPS hosting built for gamers and professionals. Enterprise hardware, global infrastructure, unbeatable prices.</p>
+      <div class="footer-social">
+        <a href="https://discord.gg/xS5uYX8Sm" target="_blank" class="fsoc">🎮</a>
+        <a href="https://hdxcloud.xyz" target="_blank" class="fsoc">🌐</a>
+        <a href="#" class="fsoc">📧</a>
+        <a href="#" class="fsoc">📢</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>HOSTING</h4>
+      <ul>
+        <li><a href="#plans">Minecraft Hosting</a></li>
+        <li><a href="#plans">VPS Hosting</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#datacenter">Datacenters</a></li>
+        <li><a href="#panel">Control Panel</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>SUPPORT</h4>
+      <ul>
+        <li><a href="https://discord.gg/xS5uYX8Sm" target="_blank">Discord Server</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#support">Knowledge Base</a></li>
+        <li><a href="#status">Server Status</a></li>
+        <li><a href="https://hdxcloud.xyz" target="_blank">Dashboard</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>COMPANY</h4>
+      <ul>
+        <li><a href="#">About HDXCloud</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Refund Policy</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2024 HDXCloud. All rights reserved. Designed for Gamers.</p>
+    <div class="footer-founders">
+      Founded by <span>HDX CO</span> · Co-founders: <span>CLOWN</span>, <span>SENSHI</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ===== CURSOR =====
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);}
+animRing();
+document.querySelectorAll('a,button,.plan-card,.feat-card,.status-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.width='20px';cursor.style.height='20px';ring.style.width='52px';ring.style.height='52px';});
+  el.addEventListener('mouseleave',()=>{cursor.style.width='12px';cursor.style.height='12px';ring.style.width='36px';ring.style.height='36px';});
+});
+
+// ===== LOADER =====
+const loader=document.getElementById('loader');
+const pct=document.getElementById('loader-pct');
+let p=0;
+const lInterval=setInterval(()=>{
+  p=Math.min(p+Math.random()*4+1,100);
+  pct.textContent=Math.floor(p)+'%';
+  if(p>=100){clearInterval(lInterval);setTimeout(()=>{loader.classList.add('hidden');startHeroAnim();},400);}
+},50);
+// Loader particles
+const lp=document.getElementById('loader-particles');
+for(let i=0;i<30;i++){
+  const d=document.createElement('div');
+  d.className='lp';
+  d.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*2}s;`;
+  lp.appendChild(d);
+}
+
+// ===== PARTICLES BG =====
+const pbg=document.getElementById('particles-bg');
+for(let i=0;i<60;i++){
+  const d=document.createElement('div');
+  d.className='pt';
+  d.style.cssText=`left:${Math.random()*100}%;animation-duration:${8+Math.random()*15}s;animation-delay:${Math.random()*15}s;opacity:${0.3+Math.random()*0.5};`;
+  pbg.appendChild(d);
+}
+
+// ===== NAV SCROLL =====
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>50);
+});
+
+// ===== MOBILE NAV =====
+function openMobileNav(){document.getElementById('mobile-nav').classList.add('open');}
+function closeMobileNav(){document.getElementById('mobile-nav').classList.remove('open');}
+document.getElementById('mobile-close').addEventListener('click',closeMobileNav);
+
+// ===== HERO CANVAS — WORLD MAP =====
+function startHeroAnim(){
+  const canvas=document.getElementById('hero-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){W=canvas.width=canvas.offsetWidth;H=canvas.height=canvas.offsetHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+
+  // World map outline points (simplified continents as polygons)
+  const continents=[
+    // North America
+    [[0.08,0.15],[0.22,0.1],[0.28,0.12],[0.32,0.18],[0.3,0.28],[0.25,0.35],[0.2,0.4],[0.15,0.42],[0.1,0.38],[0.06,0.3],[0.05,0.22]],
+    // South America
+    [[0.2,0.45],[0.27,0.43],[0.32,0.5],[0.3,0.62],[0.25,0.72],[0.2,0.78],[0.17,0.72],[0.16,0.6],[0.18,0.5]],
+    // Europe
+    [[0.44,0.1],[0.52,0.08],[0.56,0.12],[0.54,0.2],[0.5,0.25],[0.46,0.22],[0.44,0.16]],
+    // Africa
+    [[0.46,0.28],[0.56,0.25],[0.6,0.32],[0.58,0.48],[0.54,0.6],[0.5,0.65],[0.46,0.6],[0.44,0.48],[0.44,0.36]],
+    // Asia
+    [[0.56,0.08],[0.72,0.06],[0.82,0.1],[0.86,0.18],[0.84,0.28],[0.78,0.32],[0.7,0.3],[0.66,0.25],[0.6,0.22],[0.57,0.16]],
+    // Australia
+    [[0.76,0.55],[0.86,0.52],[0.9,0.58],[0.88,0.66],[0.82,0.7],[0.76,0.68],[0.74,0.62]],
+  ];
+
+  // Datacenter nodes
+  const nodes=[
+    {x:0.77,y:0.42,name:'India',color:'#00d4ff'},
+    {x:0.81,y:0.52,name:'Singapore',color:'#00ffea'},
+    {x:0.63,y:0.32,name:'Dubai',color:'#00d4ff'},
+    {x:0.45,y:0.28,name:'Morocco',color:'#00aaff'},
+    {x:0.50,y:0.18,name:'Europe',color:'#00d4ff'},
+    {x:0.18,y:0.25,name:'USA',color:'#00ffea'},
+    {x:0.85,y:0.26,name:'E.Asia',color:'#0099cc'},
+  ];
+
+  // Moving particles along routes
+  const particles=[];
+  for(let i=0;i<60;i++){
+    const fromNode=nodes[Math.floor(Math.random()*nodes.length)];
+    const toNode=nodes[Math.floor(Math.random()*nodes.length)];
+    particles.push({from:fromNode,to:toNode,t:Math.random(),speed:0.002+Math.random()*0.004,size:1.5+Math.random()*1.5,opacity:0.6+Math.random()*0.4});
+  }
+
+  let time=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    time+=0.01;
+
+    // Deep bg
+    const bg=ctx.createRadialGradient(W*0.5,H*0.5,0,W*0.5,H*0.5,W*0.7);
+    bg.addColorStop(0,'rgba(2,12,28,0.6)');
+    bg.addColorStop(1,'rgba(2,4,8,0.8)');
+    ctx.fillStyle=bg;
+    ctx.fillRect(0,0,W,H);
+
+    // Grid
+    ctx.strokeStyle='rgba(0,150,255,0.04)';
+    ctx.lineWidth=1;
+    const gs=Math.min(W,H)/20;
+    for(let x=0;x<W;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    // Continents
+    ctx.lineWidth=1;
+    continents.forEach(cont=>{
+      ctx.beginPath();
+      ctx.fillStyle='rgba(0,80,160,0.08)';
+      ctx.strokeStyle='rgba(0,200,255,0.18)';
+      ctx.lineWidth=1;
+      cont.forEach((pt,i)=>{
+        const px=pt[0]*W,py=pt[1]*H;
+        if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+      });
+      ctx.closePath();ctx.fill();ctx.stroke();
+    });
+
+    // Route lines between nodes
+    ctx.lineWidth=0.8;
+    for(let i=0;i<nodes.length;i++){
+      for(let j=i+1;j<nodes.length;j++){
+        const a=nodes[i],b=nodes[j];
+        const dist=Math.hypot((b.x-a.x)*W,(b.y-a.y)*H);
+        if(dist<W*0.55){
+          const grad=ctx.createLinearGradient(a.x*W,a.y*H,b.x*W,b.y*H);
+          grad.addColorStop(0,'rgba(0,212,255,0.15)');
+          grad.addColorStop(0.5,'rgba(0,150,255,0.06)');
+          grad.addColorStop(1,'rgba(0,212,255,0.15)');
+          ctx.strokeStyle=grad;
+          ctx.beginPath();
+          const cx=(a.x+b.x)/2*W,cy=(a.y+b.y)/2*H-dist*0.2;
+          ctx.moveTo(a.x*W,a.y*H);
+          ctx.quadraticCurveTo(cx,cy,b.x*W,b.y*H);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Particles
+    particles.forEach(p=>{
+      p.t+=p.speed;
+      if(p.t>1){p.t=0;p.from=nodes[Math.floor(Math.random()*nodes.length)];p.to=nodes[Math.floor(Math.random()*nodes.length)];}
+      const t=p.t;
+      const from=p.from,to=p.to;
+      const cx=(from.x+to.x)/2*W,cy=(from.y+to.y)/2*H-Math.hypot((to.x-from.x)*W,(to.y-from.y)*H)*0.2;
+      const px=Math.pow(1-t,2)*from.x*W+2*(1-t)*t*cx+t*t*to.x*W;
+      const py=Math.pow(1-t,2)*from.y*H+2*(1-t)*t*cy+t*t*to.y*H;
+      ctx.beginPath();
+      ctx.arc(px,py,p.size,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,212,255,${p.opacity*(1-Math.abs(t-0.5)*2+0.3)})`;
+      ctx.fill();
+    });
+
+    // Nodes
+    nodes.forEach((n,i)=>{
+      const nx=n.x*W,ny=n.y*H;
+      const pulse=(Math.sin(time*2+i*1.2)+1)*0.5;
+
+      // Outer ring
+      ctx.beginPath();
+      ctx.arc(nx,ny,18+pulse*8,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(0,212,255,${0.1+pulse*0.1})`;
+      ctx.lineWidth=1;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(nx,ny,12+pulse*4,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(0,212,255,${0.2+pulse*0.15})`;
+      ctx.lineWidth=1;
+      ctx.stroke();
+
+      // Glow
+      const g=ctx.createRadialGradient(nx,ny,0,nx,ny,14);
+      g.addColorStop(0,'rgba(0,212,255,0.8)');
+      g.addColorStop(0.5,'rgba(0,150,255,0.3)');
+      g.addColorStop(1,'rgba(0,100,255,0)');
+      ctx.beginPath();
+      ctx.arc(nx,ny,14,0,Math.PI*2);
+      ctx.fillStyle=g;
+      ctx.fill();
+
+      // Core dot
+      ctx.beginPath();
+      ctx.arc(nx,ny,4,0,Math.PI*2);
+      ctx.fillStyle='#fff';
+      ctx.fill();
+
+      // Label
+      ctx.font=`700 11px 'Exo 2', sans-serif`;
+      ctx.fillStyle='rgba(200,232,255,0.8)';
+      ctx.textAlign='center';
+      ctx.fillText(n.name,nx,ny-22);
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  // World map canvas
+  drawWorldMap();
+}
+
+// ===== DATACENTER WORLD MAP =====
+function drawWorldMap(){
+  const canvas=document.getElementById('world-map-canvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width=canvas.parentElement.offsetWidth;
+  const H=canvas.height=380;
+
+  const continents=[
+    [[0.08,0.18],[0.22,0.12],[0.3,0.15],[0.35,0.22],[0.32,0.35],[0.26,0.44],[0.2,0.48],[0.14,0.45],[0.08,0.38],[0.06,0.28]],
+    [[0.2,0.5],[0.28,0.47],[0.34,0.55],[0.32,0.68],[0.26,0.8],[0.2,0.85],[0.17,0.78],[0.16,0.65],[0.18,0.55]],
+    [[0.44,0.12],[0.54,0.09],[0.58,0.15],[0.56,0.26],[0.5,0.3],[0.45,0.26],[0.44,0.18]],
+    [[0.46,0.3],[0.58,0.27],[0.62,0.36],[0.6,0.52],[0.55,0.65],[0.5,0.7],[0.46,0.64],[0.44,0.52],[0.44,0.38]],
+    [[0.58,0.1],[0.74,0.07],[0.84,0.12],[0.88,0.22],[0.86,0.34],[0.8,0.38],[0.72,0.36],[0.66,0.3],[0.6,0.25],[0.58,0.18]],
+    [[0.76,0.58],[0.88,0.54],[0.92,0.62],[0.9,0.7],[0.84,0.74],[0.78,0.72],[0.76,0.65]],
+  ];
+  const nodes=[
+    {x:0.77,y:0.45,name:'India'},{x:0.82,y:0.56,name:'Singapore'},{x:0.63,y:0.35,name:'Dubai'},
+    {x:0.45,y:0.32,name:'Morocco'},{x:0.51,y:0.2,name:'Europe'},{x:0.18,y:0.28,name:'USA'},{x:0.86,y:0.28,name:'Asia'},
+  ];
+  let t2=0;
+  const pts2=[];
+  for(let i=0;i<40;i++){
+    pts2.push({from:nodes[Math.floor(Math.random()*nodes.length)],to:nodes[Math.floor(Math.random()*nodes.length)],t:Math.random(),sp:0.003+Math.random()*0.003});
+  }
+  function drawMap(){
+    ctx.clearRect(0,0,W,H);
+    t2+=0.012;
+    const bg2=ctx.createLinearGradient(0,0,W,H);
+    bg2.addColorStop(0,'rgba(2,8,20,1)');bg2.addColorStop(1,'rgba(4,14,28,1)');
+    ctx.fillStyle=bg2;ctx.fillRect(0,0,W,H);
+    // Grid
+    ctx.strokeStyle='rgba(0,150,255,0.05)';ctx.lineWidth=1;
+    for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    // Continents
+    continents.forEach(c=>{
+      ctx.beginPath();
+      c.forEach((p,i)=>{const px=p[0]*W,py=p[1]*H;if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);});
+      ctx.closePath();
+      ctx.fillStyle='rgba(0,80,160,0.1)';ctx.fill();
+      ctx.strokeStyle='rgba(0,200,255,0.2)';ctx.lineWidth=1.5;ctx.stroke();
+    });
+    // Routes
+    for(let i=0;i<nodes.length;i++){
+      for(let j=i+1;j<nodes.length;j++){
+        const a=nodes[i],b=nodes[j];
+        const dist=Math.hypot((b.x-a.x)*W,(b.y-a.y)*H);
+        if(dist<W*0.6){
+          const grad=ctx.createLinearGradient(a.x*W,a.y*H,b.x*W,b.y*H);
+          grad.addColorStop(0,'rgba(0,212,255,0.2)');grad.addColorStop(0.5,'rgba(0,100,255,0.08)');grad.addColorStop(1,'rgba(0,212,255,0.2)');
+          ctx.strokeStyle=grad;ctx.lineWidth=0.8;
+          ctx.beginPath();
+          const cx=(a.x+b.x)/2*W,cy=(a.y+b.y)/2*H-dist*0.18;
+          ctx.moveTo(a.x*W,a.y*H);ctx.quadraticCurveTo(cx,cy,b.x*W,b.y*H);ctx.stroke();
+        }
+      }
+    }
+    // Particles
+    pts2.forEach(p=>{
+      p.t+=p.sp;if(p.t>1){p.t=0;p.from=nodes[Math.floor(Math.random()*nodes.length)];p.to=nodes[Math.floor(Math.random()*nodes.length)];}
+      const t=p.t,from=p.from,to=p.to;
+      const cx=(from.x+to.x)/2*W,cy=(from.y+to.y)/2*H-Math.hypot((to.x-from.x)*W,(to.y-from.y)*H)*0.18;
+      const px=Math.pow(1-t,2)*from.x*W+2*(1-t)*t*cx+t*t*to.x*W;
+      const py=Math.pow(1-t,2)*from.y*H+2*(1-t)*t*cy+t*t*to.y*H;
+      ctx.beginPath();ctx.arc(px,py,1.5,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,212,255,${0.7*(1-Math.abs(t-0.5)*2+0.3)})`;ctx.fill();
+    });
+    // Nodes
+    nodes.forEach((n,i)=>{
+      const nx=n.x*W,ny=n.y*H,pulse=(Math.sin(t2*1.8+i*1.3)+1)*0.5;
+      ctx.beginPath();ctx.arc(nx,ny,20+pulse*10,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(0,212,255,${0.08+pulse*0.08})`;ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();ctx.arc(nx,ny,12+pulse*5,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(0,212,255,${0.15+pulse*0.12})`;ctx.lineWidth=1;ctx.stroke();
+      const g=ctx.createRadialGradient(nx,ny,0,nx,ny,12);
+      g.addColorStop(0,'rgba(0,212,255,0.9)');g.addColorStop(0.5,'rgba(0,150,255,0.3)');g.addColorStop(1,'rgba(0,100,255,0)');
+      ctx.beginPath();ctx.arc(nx,ny,12,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      ctx.beginPath();ctx.arc(nx,ny,4,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+      ctx.font=`bold 11px 'Exo 2',sans-serif`;ctx.fillStyle='rgba(200,232,255,0.85)';ctx.textAlign='center';
+      ctx.fillText(n.name,nx,ny-24);
+    });
+    requestAnimationFrame(drawMap);
+  }
+  drawMap();
+}
+
+// ===== COUNTDOWN =====
+function updateCountdown(){
+  const now=new Date(),end=new Date(now);
+  end.setHours(23,59,59,999);
+  const diff=end-now;
+  const h=Math.floor(diff/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);
+  document.getElementById('cd-h').textContent=String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent=String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent=String(s).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown,1000);
+
+// ===== SCROLL REVEAL =====
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');}});
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// ===== COUNTER ANIMATION =====
+function animateCounter(el){
+  const target=parseInt(el.dataset.target);
+  let current=0;
+  const duration=1800;
+  const step=target/duration*16;
+  const interval=setInterval(()=>{
+    current=Math.min(current+step,target);
+    el.textContent=Math.floor(current).toLocaleString();
+    if(current>=target)clearInterval(interval);
+  },16);
+}
+const cntObserver=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('.cnt').forEach(el=>animateCounter(el));
+      cntObserver.unobserve(e.target);
+    }
+  });
+},{threshold:0.3});
+document.querySelectorAll('#hero,#counters').forEach(s=>cntObserver.observe(s));
+
+// ===== FAQ =====
+function toggleFaq(el){
+  const item=el.parentElement;
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  if(!isOpen) item.classList.add('open');
+}
+
+// ===== TABS =====
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['minecraft','vps'][i]===tab);
+  });
+  document.getElementById('tab-minecraft').classList.toggle('active',tab==='minecraft');
+  document.getElementById('tab-vps').classList.toggle('active',tab==='vps');
+}
+</script>
+</body>
+</html>
